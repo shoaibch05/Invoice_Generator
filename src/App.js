@@ -76,11 +76,12 @@ function App() {
   };
 
   const generateInvoice = () => {
+    console.log('Generating invoice with template:', selectedTemplate);
     setShowPreview(true);
   };
 
   const downloadPDF = () => {
-    console.log('Downloading PDF...');
+    console.log('Downloading PDF with template:', selectedTemplate);
   };
 
   const formatDate = (dateString) => {

@@ -15,7 +15,7 @@ A responsive, single-page Invoice Generator web application built with React and
 - **Live Preview**: Real-time preview of selected template with your data
 - **Dynamic Invoice Items**: Add/remove multiple invoice items with automatic total calculation
 - **Real-time Updates**: Auto-calculates totals when quantity or unit price changes
-- **Professional PDF Export**: Download invoices as PDF with exact template formatting
+- **Perfect PDF Export**: Download invoices as PDF with **exact template formatting** - what you see is what you get!
 - **Print Support**: Print invoices directly from the browser with clean layout
 - **Responsive Design**: Works seamlessly on desktop, tablet, and mobile devices
 
@@ -54,8 +54,21 @@ A responsive, single-page Invoice Generator web application built with React and
 
 - **Frontend**: React 18 with functional components and hooks
 - **Styling**: TailwindCSS for responsive design
-- **PDF Generation**: jsPDF with autoTable plugin
+- **PDF Generation**: jsPDF + html2canvas for pixel-perfect template rendering
 - **Build Tool**: Create React App
+
+## 🎯 PDF Generation Technology
+
+The PDF generation uses **html2canvas** to capture the exact visual representation of the selected invoice template, ensuring:
+
+- **Pixel-perfect consistency** between preview and PDF
+- **Template-specific styling** preserved in the output
+- **Currency symbols** and formatting maintained exactly
+- **High-quality output** with 2x scale rendering
+- **Automatic page breaks** for long invoices
+- **Fallback generation** if template rendering fails
+
+This approach guarantees that the downloaded PDF will look identical to what you see in the preview, regardless of which template is selected.
 
 ## Project Structure
 

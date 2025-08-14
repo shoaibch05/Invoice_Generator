@@ -1,12 +1,13 @@
-import React from 'react';
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import React, { useState } from 'react';
+import { generatePDFFromTemplate } from '../utils/pdfGenerator';
 import ModernTemplate from './invoiceTemplates/ModernTemplate';
 import ProfessionalTemplate from './invoiceTemplates/ProfessionalTemplate';
 import MinimalistTemplate from './invoiceTemplates/MinimalistTemplate';
 import CreativeTemplate from './invoiceTemplates/CreativeTemplate';
 
 function InvoicePreview({ invoiceData, totalAmount, onBack, onDownload, selectedTemplate, selectedCurrency }) {
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
@@ -34,122 +35,18 @@ function InvoicePreview({ invoiceData, totalAmount, onBack, onDownload, selected
 
   const SelectedTemplateComponent = getTemplateComponent();
 
-  const generatePDF = () => {
-    const doc = new jsPDF();
+  const handleGeneratePDF = async () => {
+    if (isGeneratingPDF) return; // Prevent multiple clicks
     
-    // Set initial position
-    let yPosition = 20;
-    
-    // Add company information
-    if (invoiceData.companyName) {
-      doc.setFontSize(24);
-      doc.setFont(undefined, 'bold');
-      doc.text('INVOICE', 20, yPosition);
-      yPosition += 15;
-      
-      doc.setFontSize(14);
-      doc.setFont(undefined, 'normal');
-      doc.text(invoiceData.companyName, 20, yPosition);
-      yPosition += 10;
-      
-      if (invoiceData.companyAddress) {
-        const addressLines = invoiceData.companyAddress.split('\n');
-        addressLines.forEach((line, index) => {
-          if (line.trim()) {
-            doc.text(line.trim(), 20, yPosition);
-            yPosition += 6;
-          }
-        });
-      }
+    setIsGeneratingPDF(true);
+    try {
+      await generatePDFFromTemplate(invoiceData, totalAmount, selectedTemplate, selectedCurrency);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('Error generating PDF. Please try again.');
+    } finally {
+      setIsGeneratingPDF(false);
     }
-    
-    // Add invoice date on the right side
-    if (invoiceData.invoiceDate) {
-      const date = new Date(invoiceData.invoiceDate);
-      const formattedDate = date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      });
-      doc.setFontSize(12);
-      doc.text(`Invoice Date: ${formattedDate}`, 120, 35);
-    }
-    
-    yPosition += 15;
-    
-    // Add customer information
-    if (invoiceData.customerName || invoiceData.customerAddress) {
-      doc.setFontSize(16);
-      doc.setFont(undefined, 'bold');
-      doc.text('Bill To:', 20, yPosition);
-      yPosition += 10;
-      
-      if (invoiceData.customerName) {
-        doc.setFontSize(12);
-        doc.setFont(undefined, 'normal');
-        doc.text(invoiceData.customerName, 20, yPosition);
-        yPosition += 8;
-      }
-      
-      if (invoiceData.customerAddress) {
-        const addressLines = invoiceData.customerAddress.split('\n');
-        addressLines.forEach((line, index) => {
-          if (line.trim()) {
-            doc.text(line.trim(), 20, yPosition);
-            yPosition += 6;
-          }
-        });
-      }
-    }
-    
-    yPosition += 15;
-    
-    // Add items table with better formatting
-    if (invoiceData.items && invoiceData.items.length > 0) {
-      const tableData = invoiceData.items.map(item => [
-        item.name || 'Item',
-        item.quantity.toString(),
-        `${selectedCurrency?.symbol || '$'}${item.unitPrice.toFixed(2)}`,
-        `${selectedCurrency?.symbol || '$'}${item.total.toFixed(2)}`
-      ]);
-      
-      doc.autoTable({
-        startY: yPosition,
-        head: [['Item', 'Quantity', 'Unit Price', 'Total']],
-        body: tableData,
-        theme: 'grid',
-        headStyles: { 
-          fillColor: [59, 130, 246],
-          textColor: [255, 255, 255],
-          fontStyle: 'bold'
-        },
-        styles: {
-          fontSize: 11,
-          cellPadding: 5
-        },
-        columnStyles: {
-          0: { cellWidth: 80 }, // Item name
-          1: { halign: 'center', cellWidth: 30 }, // Quantity
-          2: { halign: 'right', cellWidth: 35 }, // Unit Price
-          3: { halign: 'right', cellWidth: 35 }  // Total
-        },
-        margin: { top: 10 }
-      });
-    }
-    
-    // Add total with better formatting
-    const finalY = doc.lastAutoTable.finalY + 15;
-    doc.setFontSize(18);
-    doc.setFont(undefined, 'bold');
-    doc.text(`Total: ${selectedCurrency?.symbol || '$'}${totalAmount.toFixed(2)}`, 150, finalY);
-    
-    // Add footer
-    doc.setFontSize(10);
-    doc.setFont(undefined, 'normal');
-    doc.text('Thank you for your business!', 105, finalY + 20, { align: 'center' });
-    
-    // Save the PDF
-    doc.save('invoice.pdf');
   };
 
   const handlePrint = () => {
@@ -237,10 +134,11 @@ function InvoicePreview({ invoiceData, totalAmount, onBack, onDownload, selected
         
         <div className="flex space-x-3">
           <button
-            onClick={generatePDF}
-            className="btn-primary"
+            onClick={handleGeneratePDF}
+            disabled={isGeneratingPDF}
+            className={`btn-primary ${isGeneratingPDF ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
-            Download PDF
+            {isGeneratingPDF ? 'Generating PDF...' : 'Download PDF'}
           </button>
           <button
             onClick={handlePrint}
