@@ -63,7 +63,25 @@ export const generatePDFFromTemplate = async (invoiceData, totalAmount, selected
         scrollX: 0,
         scrollY: 0,
         logging: false,
-        removeContainer: false
+        removeContainer: false,
+        foreignObjectRendering: true,
+        imageTimeout: 0,
+        onclone: (clonedDoc) => {
+          // Ensure all elements are visible in the cloned document
+          const clonedPreview = clonedDoc.querySelector('.invoice-content');
+          if (clonedPreview) {
+            clonedPreview.style.overflow = 'visible';
+            clonedPreview.style.height = 'auto';
+            clonedPreview.style.minHeight = '100vh';
+            
+            // Ensure all child elements are visible
+            const allElements = clonedPreview.querySelectorAll('*');
+            allElements.forEach(el => {
+              el.style.visibility = 'visible';
+              el.style.display = el.style.display || 'block';
+            });
+          }
+        }
       });
       
       // Create PDF
@@ -124,7 +142,8 @@ export const generatePDFFromTemplate = async (invoiceData, totalAmount, selected
     tempContainer.style.borderRadius = '8px';
     tempContainer.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
     tempContainer.style.textAlign = 'left';
-    tempContainer.style.overflow = 'hidden';
+    tempContainer.style.overflow = 'visible';
+    tempContainer.style.minHeight = '100vh';
     
     // Add Tailwind CSS classes and ensure proper styling
     tempContainer.className = 'bg-white invoice-content';
@@ -135,31 +154,77 @@ export const generatePDFFromTemplate = async (invoiceData, totalAmount, selected
     wrapper.style.height = '100%';
     wrapper.style.display = 'flex';
     wrapper.style.flexDirection = 'column';
+    wrapper.style.minHeight = '100vh';
     tempContainer.appendChild(wrapper);
     
-    // Ensure Tailwind CSS is available by copying styles from the main document
-    const styleSheets = Array.from(document.styleSheets);
-    styleSheets.forEach(sheet => {
-      try {
-        const rules = Array.from(sheet.cssRules || sheet.rules || []);
-        rules.forEach(rule => {
-          if (rule.selectorText && rule.selectorText.includes('text-center')) {
-            // Ensure text-center and other alignment classes work
-            tempContainer.style.setProperty('--tw-text-align', 'center');
-          }
-        });
-      } catch (e) {
-        // Cross-origin stylesheets will throw an error, ignore them
-      }
-    });
+    // Copy all CSS styles to ensure proper rendering
+    const copyStyles = () => {
+      const styleSheets = Array.from(document.styleSheets);
+      styleSheets.forEach(sheet => {
+        try {
+          const rules = Array.from(sheet.cssRules || sheet.rules || []);
+          rules.forEach(rule => {
+            if (rule.selectorText) {
+              // Ensure all Tailwind classes work properly
+              if (rule.selectorText.includes('text-center')) {
+                tempContainer.style.setProperty('--tw-text-align', 'center');
+              }
+              if (rule.selectorText.includes('text-right')) {
+                tempContainer.style.setProperty('--tw-text-align', 'right');
+              }
+              if (rule.selectorText.includes('text-left')) {
+                tempContainer.style.setProperty('--tw-text-align', 'left');
+              }
+              if (rule.selectorText.includes('flex')) {
+                tempContainer.style.setProperty('--tw-display', 'flex');
+              }
+              if (rule.selectorText.includes('justify-center')) {
+                tempContainer.style.setProperty('--tw-justify-content', 'center');
+              }
+              if (rule.selectorText.includes('justify-between')) {
+                tempContainer.style.setProperty('--tw-justify-content', 'space-between');
+              }
+              if (rule.selectorText.includes('items-center')) {
+                tempContainer.style.setProperty('--tw-align-items', 'center');
+              }
+            }
+          });
+        } catch (e) {
+          // Cross-origin stylesheets will throw an error, ignore them
+        }
+      });
+    };
     
+    copyStyles();
     document.body.appendChild(tempContainer);
     
     // Render the template
     ReactDOM.render(React.createElement(TemplateComponent, templateProps), wrapper);
     
     // Wait for rendering to complete and CSS to apply
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Additional wait to ensure all elements are properly rendered
+    await new Promise(resolve => {
+      let attempts = 0;
+      const maxAttempts = 50; // 5 seconds max
+      
+      const checkElements = () => {
+        attempts++;
+        const totalElement = tempContainer.querySelector('[class*="text-2xl"], [class*="text-xl"]');
+        if (totalElement && totalElement.textContent.includes('Total:')) {
+          console.log('Total element found:', totalElement.textContent);
+          resolve();
+        } else if (attempts >= maxAttempts) {
+          console.log('Timeout waiting for total element, proceeding anyway');
+          resolve();
+        } else {
+          console.log(`Waiting for total element to render... (attempt ${attempts}/${maxAttempts})`);
+          setTimeout(checkElements, 100);
+        }
+      };
+      checkElements();
+    });
     
     // Convert to canvas with high quality settings
     const canvas = await html2canvas(tempContainer, {
@@ -172,7 +237,25 @@ export const generatePDFFromTemplate = async (invoiceData, totalAmount, selected
       scrollX: 0,
       scrollY: 0,
       logging: false,
-      removeContainer: false
+      removeContainer: false,
+      foreignObjectRendering: true,
+      imageTimeout: 0,
+      onclone: (clonedDoc) => {
+        // Ensure all elements are visible in the cloned document
+        const clonedContainer = clonedDoc.querySelector('.invoice-content');
+        if (clonedContainer) {
+          clonedContainer.style.overflow = 'visible';
+          clonedContainer.style.height = 'auto';
+          clonedContainer.style.minHeight = '100vh';
+          
+          // Ensure all child elements are visible
+          const allElements = clonedContainer.querySelectorAll('*');
+          allElements.forEach(el => {
+            el.style.visibility = 'visible';
+            el.style.display = el.style.display || 'block';
+          });
+        }
+      }
     });
     
     // Clean up
