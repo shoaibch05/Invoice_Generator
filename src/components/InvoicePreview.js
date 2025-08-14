@@ -1,8 +1,12 @@
 import React from 'react';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
+import ModernTemplate from './invoiceTemplates/ModernTemplate';
+import ProfessionalTemplate from './invoiceTemplates/ProfessionalTemplate';
+import MinimalistTemplate from './invoiceTemplates/MinimalistTemplate';
+import CreativeTemplate from './invoiceTemplates/CreativeTemplate';
 
-function InvoicePreview({ invoiceData, totalAmount, onBack, onDownload }) {
+function InvoicePreview({ invoiceData, totalAmount, onBack, onDownload, selectedTemplate, selectedCurrency }) {
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
@@ -11,6 +15,24 @@ function InvoicePreview({ invoiceData, totalAmount, onBack, onDownload }) {
       day: 'numeric'
     });
   };
+
+  // Get the selected template component
+  const getTemplateComponent = () => {
+    switch (selectedTemplate) {
+      case 'modern':
+        return ModernTemplate;
+      case 'professional':
+        return ProfessionalTemplate;
+      case 'minimalist':
+        return MinimalistTemplate;
+      case 'creative':
+        return CreativeTemplate;
+      default:
+        return ModernTemplate;
+    }
+  };
+
+  const SelectedTemplateComponent = getTemplateComponent();
 
   const generatePDF = () => {
     const doc = new jsPDF();
@@ -87,8 +109,8 @@ function InvoicePreview({ invoiceData, totalAmount, onBack, onDownload }) {
       const tableData = invoiceData.items.map(item => [
         item.name || 'Item',
         item.quantity.toString(),
-        `$${item.unitPrice.toFixed(2)}`,
-        `$${item.total.toFixed(2)}`
+        `${selectedCurrency?.symbol || '$'}${item.unitPrice.toFixed(2)}`,
+        `${selectedCurrency?.symbol || '$'}${item.total.toFixed(2)}`
       ]);
       
       doc.autoTable({
@@ -119,7 +141,7 @@ function InvoicePreview({ invoiceData, totalAmount, onBack, onDownload }) {
     const finalY = doc.lastAutoTable.finalY + 15;
     doc.setFontSize(18);
     doc.setFont(undefined, 'bold');
-    doc.text(`Total: $${totalAmount.toFixed(2)}`, 150, finalY);
+    doc.text(`Total: ${selectedCurrency?.symbol || '$'}${totalAmount.toFixed(2)}`, 150, finalY);
     
     // Add footer
     doc.setFontSize(10);
@@ -230,71 +252,13 @@ function InvoicePreview({ invoiceData, totalAmount, onBack, onDownload }) {
       </div>
 
       {/* Invoice Preview - This is what gets printed */}
-      <div className="invoice-content bg-white rounded-lg shadow-lg border border-gray-200 p-8 print:shadow-none print:border-0">
-        {/* Invoice Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start mb-8 pb-6 border-b border-gray-200">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">INVOICE</h1>
-            {invoiceData.companyName && (
-              <div className="text-lg font-semibold text-gray-800">{invoiceData.companyName}</div>
-            )}
-            {invoiceData.companyAddress && (
-              <div className="text-gray-600 whitespace-pre-line">{invoiceData.companyAddress}</div>
-            )}
-          </div>
-          
-          <div className="text-right mt-4 md:mt-0">
-            <div className="text-sm text-gray-500 mb-1">Invoice Date:</div>
-            <div className="font-medium text-gray-900">{formatDate(invoiceData.invoiceDate)}</div>
-          </div>
-        </div>
-
-        {/* Bill To Section */}
-        <div className="mb-8">
-          <h3 className="text-lg font-semibold text-gray-800 mb-3">Bill To:</h3>
-          {invoiceData.customerName && (
-            <div className="font-medium text-gray-900">{invoiceData.customerName}</div>
-          )}
-          {invoiceData.customerAddress && (
-            <div className="text-gray-600 whitespace-pre-line">{invoiceData.customerAddress}</div>
-          )}
-        </div>
-
-        {/* Invoice Items Table */}
-        <div className="mb-8">
-          <table className="w-full border-collapse">
-            <thead>
-              <tr className="border-b-2 border-gray-300">
-                <th className="text-left py-3 px-4 font-semibold text-gray-800">Item</th>
-                <th className="text-right py-3 px-4 font-semibold text-gray-800">Quantity</th>
-                <th className="text-right py-3 px-4 font-semibold text-gray-800">Unit Price</th>
-                <th className="text-right py-3 px-4 font-semibold text-gray-800">Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              {invoiceData.items.map((item, index) => (
-                <tr key={item.id} className="border-b border-gray-200">
-                  <td className="py-3 px-4 text-gray-900">{item.name || `Item ${index + 1}`}</td>
-                  <td className="py-3 px-4 text-right text-gray-900">{item.quantity}</td>
-                  <td className="py-3 px-4 text-right text-gray-900">${item.unitPrice.toFixed(2)}</td>
-                  <td className="py-3 px-4 text-right font-medium text-gray-900">${item.total.toFixed(2)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Total Amount */}
-        <div className="text-right">
-          <div className="text-2xl font-bold text-gray-900">
-            Total: <span className="text-primary-600">${totalAmount.toFixed(2)}</span>
-          </div>
-        </div>
-
-        {/* Footer Note */}
-        <div className="mt-12 pt-6 border-t border-gray-200 text-center text-gray-500 text-sm">
-          Thank you for your business!
-        </div>
+      <div className="invoice-content">
+        <SelectedTemplateComponent
+          invoiceData={invoiceData}
+          totalAmount={totalAmount}
+          currency={selectedCurrency}
+          formatDate={formatDate}
+        />
       </div>
     </div>
   );

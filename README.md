@@ -2,15 +2,53 @@
 
 A responsive, single-page Invoice Generator web application built with React and TailwindCSS.
 
-## Features
+## ✨ Features
 
-- **Clean, Modern UI**: Professional design following modern UI/UX principles
-- **Responsive Design**: Fully mobile-responsive layout
+- **Multiple Invoice Designs**: 4 professional invoice templates to choose from
+  - Modern (Blue theme with clean layout)
+  - Professional (Gray gradient with corporate style)
+  - Minimalist (Clean and elegant design)
+  - Creative (Colorful gradient design)
+- **Template Thumbnails**: Visual preview and selection of invoice designs
+- **Currency Support**: 6 different currencies with instant symbol updates
+  - USD ($), EUR (€), GBP (£), INR (₹), PKR (₨), AUD (A$)
+- **Live Preview**: Real-time preview of selected template with your data
 - **Dynamic Invoice Items**: Add/remove multiple invoice items with automatic total calculation
 - **Real-time Updates**: Auto-calculates totals when quantity or unit price changes
-- **Invoice Preview**: Professional invoice preview with print-friendly layout
-- **PDF Export**: Download invoices as PDF using jsPDF
-- **Print Support**: Print invoices directly from the browser
+- **Professional PDF Export**: Download invoices as PDF with exact template formatting
+- **Print Support**: Print invoices directly from the browser with clean layout
+- **Responsive Design**: Works seamlessly on desktop, tablet, and mobile devices
+
+## 🎨 Invoice Templates
+
+### 1. Modern Template
+- Blue color scheme with clean, modern layout
+- Professional typography and spacing
+- Ideal for tech companies and startups
+
+### 2. Professional Template
+- Gray gradient header with corporate styling
+- Traditional business layout
+- Perfect for established companies
+
+### 3. Minimalist Template
+- Clean, elegant design with minimal elements
+- Centered layout with light typography
+- Great for creative agencies and freelancers
+
+### 4. Creative Template
+- Colorful gradient design with vibrant colors
+- Modern styling with rounded elements
+- Perfect for creative businesses and events
+
+## 💱 Supported Currencies
+
+- **USD** ($) - US Dollar
+- **EUR** (€) - Euro
+- **GBP** (£) - British Pound
+- **INR** (₹) - Indian Rupee
+- **PKR** (₨) - Pakistani Rupee
+- **AUD** (A$) - Australian Dollar
 
 ## Technology Stack
 
@@ -24,19 +62,26 @@ A responsive, single-page Invoice Generator web application built with React and
 ```
 src/
 ├── components/
-│   ├── Header.js          # App header with title and description
-│   ├── InvoiceForm.js     # Company and customer information form
-│   ├── InvoiceTable.js    # Dynamic invoice items table
-│   ├── InvoicePreview.js  # Invoice preview and print layout
-│   └── Footer.js          # Total amount and action buttons
-├── App.js                 # Main application component
-├── index.js               # React entry point
-└── index.css              # TailwindCSS styles and custom components
+│   ├── invoiceTemplates/
+│   │   ├── ModernTemplate.js      # Modern blue theme
+│   │   ├── ProfessionalTemplate.js # Professional gray theme
+│   │   ├── MinimalistTemplate.js  # Minimalist clean design
+│   │   └── CreativeTemplate.js    # Creative colorful design
+│   ├── Header.js                  # App header with title
+│   ├── InvoiceForm.js             # Company and customer form
+│   ├── InvoiceTable.js            # Dynamic invoice items table
+│   ├── InvoicePreview.js          # Invoice preview and print
+│   ├── Footer.js                  # Total amount and actions
+│   ├── TemplateSelector.js        # Template thumbnails and preview
+│   └── CurrencySelector.js        # Currency dropdown
+├── App.js                         # Main application component
+├── index.js                       # React entry point
+└── index.css                      # TailwindCSS styles
 ```
 
 ## Installation
 
-1. **Clone the repository** (if applicable) or navigate to the project directory
+1. **Clone the repository** or navigate to the project directory
 
 2. **Install dependencies**:
    ```bash
@@ -63,51 +108,66 @@ src/
    - Customer address
    - Invoice date
 
-3. **Add Invoice Items**:
+3. **Select Currency**:
+   - Choose from 6 supported currencies
+   - Currency symbols update instantly across the invoice
+
+4. **Choose Invoice Design**:
+   - Click on template thumbnails to preview different designs
+   - Live preview updates in real-time with your data
+
+5. **Add Invoice Items**:
    - Click "Add Item" to add new items
    - Enter item name, quantity, and unit price
-   - Totals are calculated automatically
+   - Totals are calculated automatically with selected currency
    - Remove items using the "Remove" button
 
-4. **Generate Invoice**:
+6. **Generate Invoice**:
    - Click "Generate Invoice" to preview
    - Use "Print" button to print the invoice
    - Click "Download PDF" to save as PDF
 
 ### Features
 
-- **Auto-calculation**: Item totals and invoice total are calculated automatically
+- **Template Selection**: Choose from 4 professional designs
+- **Currency Switching**: Change currency and see instant updates
+- **Auto-calculation**: Item totals and invoice total calculated automatically
 - **Dynamic Items**: Add or remove invoice items as needed
-- **Responsive Design**: Works seamlessly on desktop, tablet, and mobile devices
+- **Responsive Design**: Works seamlessly on all devices
 - **Print-friendly**: Optimized layout for printing
-- **PDF Export**: Professional PDF output with proper formatting
+- **PDF Export**: Professional PDF output with exact template formatting
 
 ## Customization
 
-### Adding New Fields
+### Adding New Templates
 
-The component structure is designed to be easily extensible. To add new fields:
+1. **Create new template file** in `src/components/invoiceTemplates/`
+2. **Add template to TemplateSelector** component
+3. **Update template selection logic** in App.js
+4. **Test PDF generation** and print functionality
 
-1. **Update the state** in `App.js`
-2. **Add form fields** in the appropriate component
-3. **Update the preview** in `InvoicePreview.js`
-4. **Modify PDF generation** in `Footer.js`
+### Adding New Currencies
+
+1. **Add currency to CurrencySelector** component
+2. **Update currency symbols** in all templates
+3. **Test currency switching** functionality
 
 ### Styling
 
 - **TailwindCSS Classes**: Use Tailwind utility classes for styling
-- **Custom Components**: Add new component classes in `src/index.css`
-- **Theme Colors**: Modify the primary color scheme in `tailwind.config.js`
+- **Template Components**: Each template is a separate component for easy customization
+- **Theme Colors**: Modify color schemes in individual template files
 
 ## Future Enhancements
 
 - **E-Signature Support**: Add digital signature fields
-- **Invoice Templates**: Multiple invoice design templates
+- **Invoice Numbering**: Automatic invoice number generation
 - **Data Persistence**: Save invoices locally or to cloud storage
 - **Invoice History**: Track and manage previous invoices
 - **Tax Calculation**: Automatic tax calculation and display
-- **Currency Support**: Multiple currency options
 - **Email Integration**: Send invoices directly via email
+- **More Templates**: Additional invoice design options
+- **Custom Branding**: Upload company logos and custom colors
 
 ## Browser Support
 

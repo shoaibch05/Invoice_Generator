@@ -1,8 +1,21 @@
 import React from 'react';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
+import ModernTemplate from './invoiceTemplates/ModernTemplate';
+import ProfessionalTemplate from './invoiceTemplates/ProfessionalTemplate';
+import MinimalistTemplate from './invoiceTemplates/MinimalistTemplate';
+import CreativeTemplate from './invoiceTemplates/CreativeTemplate';
 
-function Footer({ totalAmount, onGenerate, onDownload, invoiceData }) {
+function Footer({ totalAmount, onGenerate, onDownload, invoiceData, selectedTemplate, selectedCurrency }) {
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
   const generatePDF = () => {
     const doc = new jsPDF();
     
@@ -78,8 +91,8 @@ function Footer({ totalAmount, onGenerate, onDownload, invoiceData }) {
       const tableData = invoiceData.items.map(item => [
         item.name || 'Item',
         item.quantity.toString(),
-        `$${item.unitPrice.toFixed(2)}`,
-        `$${item.total.toFixed(2)}`
+        `${selectedCurrency?.symbol || '$'}${item.unitPrice.toFixed(2)}`,
+        `${selectedCurrency?.symbol || '$'}${item.total.toFixed(2)}`
       ]);
       
       doc.autoTable({
@@ -110,7 +123,7 @@ function Footer({ totalAmount, onGenerate, onDownload, invoiceData }) {
     const finalY = doc.lastAutoTable.finalY + 15;
     doc.setFontSize(18);
     doc.setFont(undefined, 'bold');
-    doc.text(`Total: $${totalAmount.toFixed(2)}`, 150, finalY);
+    doc.text(`Total: ${selectedCurrency?.symbol || '$'}${totalAmount.toFixed(2)}`, 150, finalY);
     
     // Add footer
     doc.setFontSize(10);
@@ -126,7 +139,7 @@ function Footer({ totalAmount, onGenerate, onDownload, invoiceData }) {
       <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
         <div className="text-right">
           <div className="text-2xl font-bold text-gray-900">
-            Total Amount: <span className="text-primary-600">${totalAmount.toFixed(2)}</span>
+            Total Amount: <span className="text-primary-600">{selectedCurrency?.symbol || '$'}{totalAmount.toFixed(2)}</span>
           </div>
         </div>
         

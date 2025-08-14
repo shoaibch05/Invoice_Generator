@@ -4,6 +4,8 @@ import InvoiceForm from './components/InvoiceForm';
 import InvoiceTable from './components/InvoiceTable';
 import InvoicePreview from './components/InvoicePreview';
 import Footer from './components/Footer';
+import TemplateSelector from './components/TemplateSelector';
+import CurrencySelector from './components/CurrencySelector';
 
 function App() {
   const [invoiceData, setInvoiceData] = useState({
@@ -18,6 +20,12 @@ function App() {
   });
 
   const [showPreview, setShowPreview] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState('modern');
+  const [selectedCurrency, setSelectedCurrency] = useState({
+    code: 'USD',
+    symbol: '$',
+    name: 'US Dollar'
+  });
 
   const totalAmount = invoiceData.items.reduce((sum, item) => sum + item.total, 0);
 
@@ -75,6 +83,15 @@ function App() {
     console.log('Downloading PDF...');
   };
 
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
@@ -92,6 +109,21 @@ function App() {
               addItem={addItem}
               removeItem={removeItem}
               updateItem={updateItem}
+              currency={selectedCurrency}
+            />
+
+            <CurrencySelector
+              selectedCurrency={selectedCurrency}
+              onCurrencyChange={setSelectedCurrency}
+            />
+
+            <TemplateSelector
+              selectedTemplate={selectedTemplate}
+              onTemplateSelect={setSelectedTemplate}
+              invoiceData={invoiceData}
+              totalAmount={totalAmount}
+              currency={selectedCurrency}
+              formatDate={formatDate}
             />
             
             <Footer 
@@ -99,6 +131,8 @@ function App() {
               onGenerate={generateInvoice}
               onDownload={downloadPDF}
               invoiceData={invoiceData}
+              selectedTemplate={selectedTemplate}
+              selectedCurrency={selectedCurrency}
             />
           </>
         ) : (
@@ -107,6 +141,8 @@ function App() {
             totalAmount={totalAmount}
             onBack={() => setShowPreview(false)}
             onDownload={downloadPDF}
+            selectedTemplate={selectedTemplate}
+            selectedCurrency={selectedCurrency}
           />
         )}
       </main>

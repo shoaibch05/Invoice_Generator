@@ -1,6 +1,6 @@
 import React from 'react';
 
-function InvoiceTable({ items, addItem, removeItem, updateItem }) {
+function InvoiceTable({ items, addItem, removeItem, updateItem, currency }) {
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
       <div className="flex justify-between items-center mb-6">
@@ -57,7 +57,7 @@ function InvoiceTable({ items, addItem, removeItem, updateItem }) {
                 </td>
                 <td className="py-3 px-4">
                   <span className="font-medium text-gray-900">
-                    ${item.total.toFixed(2)}
+                    {currency?.symbol || '$'}{item.total.toFixed(2)}
                   </span>
                 </td>
                 <td className="py-3 px-4">
