@@ -38,8 +38,16 @@ export const generatePDFFromTemplate = async (invoiceData, totalAmount, selected
   try {
     console.log('Generating PDF with template:', selectedTemplate);
     
-    // First, try to capture the existing preview element
-    const existingPreview = document.querySelector('.invoice-content');
+    // First, try to capture the existing preview element from TemplateSelector
+    let existingPreview = document.querySelector('.invoice-content');
+    
+    // If no preview found, try to find it in the TemplateSelector specifically
+    if (!existingPreview) {
+      const templateSelector = document.querySelector('[class*="TemplateSelector"]');
+      if (templateSelector) {
+        existingPreview = templateSelector.querySelector('.invoice-content');
+      }
+    }
     
     if (existingPreview) {
       console.log('Using existing preview element for PDF generation');
@@ -115,23 +123,43 @@ export const generatePDFFromTemplate = async (invoiceData, totalAmount, selected
     tempContainer.style.boxSizing = 'border-box';
     tempContainer.style.borderRadius = '8px';
     tempContainer.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+    tempContainer.style.textAlign = 'left';
+    tempContainer.style.overflow = 'hidden';
     
-    // Add Tailwind CSS classes that might be needed
+    // Add Tailwind CSS classes and ensure proper styling
     tempContainer.className = 'bg-white invoice-content';
     
     // Create a wrapper to ensure proper rendering
     const wrapper = document.createElement('div');
     wrapper.style.width = '100%';
     wrapper.style.height = '100%';
+    wrapper.style.display = 'flex';
+    wrapper.style.flexDirection = 'column';
     tempContainer.appendChild(wrapper);
+    
+    // Ensure Tailwind CSS is available by copying styles from the main document
+    const styleSheets = Array.from(document.styleSheets);
+    styleSheets.forEach(sheet => {
+      try {
+        const rules = Array.from(sheet.cssRules || sheet.rules || []);
+        rules.forEach(rule => {
+          if (rule.selectorText && rule.selectorText.includes('text-center')) {
+            // Ensure text-center and other alignment classes work
+            tempContainer.style.setProperty('--tw-text-align', 'center');
+          }
+        });
+      } catch (e) {
+        // Cross-origin stylesheets will throw an error, ignore them
+      }
+    });
     
     document.body.appendChild(tempContainer);
     
     // Render the template
     ReactDOM.render(React.createElement(TemplateComponent, templateProps), wrapper);
     
-    // Wait for rendering to complete
-    await new Promise(resolve => setTimeout(resolve, 300));
+    // Wait for rendering to complete and CSS to apply
+    await new Promise(resolve => setTimeout(resolve, 500));
     
     // Convert to canvas with high quality settings
     const canvas = await html2canvas(tempContainer, {
