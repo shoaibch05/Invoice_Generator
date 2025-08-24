@@ -67,7 +67,7 @@ function ProfessionalTemplate({ invoiceData, totalAmount, currency, formatDate }
       {/* Total Amount */}
       <div className="text-right">
         <div className="inline-block bg-gray-800 text-white px-6 py-3 rounded-lg">
-          <div className="text-xl font-bold">
+          <div className=" relative z-10 pb-3 text-xl font-bold">
             Total: {currency.symbol}{totalAmount.toFixed(2)}
           </div>
         </div>

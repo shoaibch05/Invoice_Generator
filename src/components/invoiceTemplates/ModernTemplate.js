@@ -26,7 +26,7 @@ function ModernTemplate({ invoiceData, totalAmount, currency, formatDate }) {
       {/* Bill To Section */}
       <div className="mb-8">
         <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
-          <span className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm mr-3">Bill To:</span>
+          <span className=" text-blue-600 px-3 py-1 text-sm mr-3">Bill To:</span>
         </h3>
         <div className="bg-gray-50 p-4 rounded-lg">
           {invoiceData.customerName && (
@@ -64,8 +64,8 @@ function ModernTemplate({ invoiceData, totalAmount, currency, formatDate }) {
 
       {/* Total Amount */}
       <div className="text-right">
-        <div className="inline-block bg-blue-600 text-white px-8 py-4 rounded-lg">
-          <div className="text-2xl font-bold">
+        <div className="inline-block bg-blue-600 px-8 py-4 rounded-lg">
+          <div className="relative z-10 text-white text-2xl font-bold pb-3 ">
             Total: {currency.symbol}{totalAmount.toFixed(2)}
           </div>
         </div>

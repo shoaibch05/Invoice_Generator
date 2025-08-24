@@ -1,4 +1,4 @@
-import React from 'react';
+
 
 function CreativeTemplate({ invoiceData, totalAmount, currency, formatDate }) {
   return (
@@ -28,7 +28,7 @@ function CreativeTemplate({ invoiceData, totalAmount, currency, formatDate }) {
       {/* Bill To Section */}
       <div className="mb-8">
         <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
-          <span className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-full text-sm mr-3">Bill To:</span>
+          <span className="px-4 py-2 rounded-full text-sm mr-3 pb-3">Bill To:</span>
         </h3>
         <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-lg border-l-4 border-purple-500">
           {invoiceData.customerName && (
@@ -67,7 +67,7 @@ function CreativeTemplate({ invoiceData, totalAmount, currency, formatDate }) {
       {/* Total Amount */}
       <div className="text-right">
         <div className="inline-block bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-4 rounded-lg shadow-lg">
-          <div className="text-2xl font-bold">
+          <div className="relative z-10 pb-3 text-2xl font-bold">
             Total: {currency.symbol}{totalAmount.toFixed(2)}
           </div>
         </div>

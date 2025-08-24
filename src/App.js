@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import  { useState, useRef } from 'react';
 import Header from './components/Header';
 import InvoiceForm from './components/InvoiceForm';
 import InvoiceTable from './components/InvoiceTable';
@@ -6,6 +6,7 @@ import InvoicePreview from './components/InvoicePreview';
 import Footer from './components/Footer';
 import TemplateSelector from './components/TemplateSelector';
 import CurrencySelector from './components/CurrencySelector';
+import LastSection from './components/LastSection';
 
 function App() {
   const [invoiceData, setInvoiceData] = useState({
@@ -28,6 +29,16 @@ function App() {
   });
 
   const totalAmount = invoiceData.items.reduce((sum, item) => sum + item.total, 0);
+
+  // Refs for scrolling
+  const invoiceFormRef = useRef(null);
+
+
+  // Scroll handlers
+  const scrollToForm = () => {
+    invoiceFormRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+  
 
   const updateInvoiceData = (field, value) => {
     setInvoiceData(prev => ({
@@ -76,12 +87,11 @@ function App() {
   };
 
   const generateInvoice = () => {
-    console.log('Generating invoice with template:', selectedTemplate);
     setShowPreview(true);
   };
 
   const downloadPDF = () => {
-    console.log('Downloading PDF with template:', selectedTemplate);
+    // PDF logic here
   };
 
   const formatDate = (dateString) => {
@@ -95,11 +105,13 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
+      <Header
+        onCreateInvoice={scrollToForm}
       
+      />
       <main className="container mx-auto px-4 py-8 max-w-6xl">
         {!showPreview ? (
-          <>
+          <div ref={invoiceFormRef}>
             <InvoiceForm 
               invoiceData={invoiceData}
               updateInvoiceData={updateInvoiceData}
@@ -117,8 +129,8 @@ function App() {
               selectedCurrency={selectedCurrency}
               onCurrencyChange={setSelectedCurrency}
             />
-
             <TemplateSelector
+            
               selectedTemplate={selectedTemplate}
               onTemplateSelect={setSelectedTemplate}
               invoiceData={invoiceData}
@@ -135,18 +147,21 @@ function App() {
               selectedTemplate={selectedTemplate}
               selectedCurrency={selectedCurrency}
             />
-          </>
+          </div>
         ) : (
-          <InvoicePreview 
-            invoiceData={invoiceData}
-            totalAmount={totalAmount}
-            onBack={() => setShowPreview(false)}
-            onDownload={downloadPDF}
-            selectedTemplate={selectedTemplate}
-            selectedCurrency={selectedCurrency}
-          />
+          <div>
+            <InvoicePreview 
+              invoiceData={invoiceData}
+              totalAmount={totalAmount}
+              onBack={() => setShowPreview(false)}
+              onDownload={downloadPDF}
+              selectedTemplate={selectedTemplate}
+              selectedCurrency={selectedCurrency}
+            />
+          </div>
         )}
       </main>
+        <LastSection />
     </div>
   );
 }
